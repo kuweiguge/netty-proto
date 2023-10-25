@@ -3,12 +3,14 @@ package com.github.kuweiguge.client.netty;
 import com.github.kuweiguge.common.codec.MsgDecoder;
 import com.github.kuweiguge.common.codec.MsgEncoder;
 import com.github.kuweiguge.common.utils.Constant;
+import com.github.kuweiguge.common.utils.NetworkUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -45,7 +47,7 @@ public class NettyClient {
 
         Bootstrap bootstrap = new Bootstrap();
         NettyClientHandler nettyClientHandler = new NettyClientHandler();
-        bootstrap.group(group).channel(NioSocketChannel.class)
+        bootstrap.group(group).channel(NetworkUtil.useEpoll() ? EpollSocketChannel.class : NioSocketChannel.class)
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .handler(new ChannelInitializer<SocketChannel>() {

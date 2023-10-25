@@ -3,10 +3,13 @@ package com.github.kuweiguge.server.netty;
 import com.github.kuweiguge.common.codec.MsgDecoder;
 import com.github.kuweiguge.common.codec.MsgEncoder;
 import com.github.kuweiguge.common.utils.Constant;
+import com.github.kuweiguge.common.utils.NetworkUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
+import io.netty.channel.epoll.Epoll;
+import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
@@ -32,7 +35,7 @@ public class NodesServer {
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
+                    .channel(NetworkUtil.useEpoll()? EpollServerSocketChannel.class : NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .option(ChannelOption.SO_BACKLOG, 1024)
                     // 保持长连接
